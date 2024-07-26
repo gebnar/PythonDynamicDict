@@ -4,7 +4,7 @@ class dynamic:
     """A dictionary wrapper that allows attribute access and mutation using both dot notation and dictionary-style indexing.
 
     ## Simple Usage
-    ```
+    ```python
     dyn = dynamic()
     dyn.key = "Value"
     print(dyn.key) # Output: Value
