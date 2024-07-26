@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2024-07-25
+### Removed
+- Removed extra/unnecessary key renaming logic when setting `_dict` directly. It is covered by `__setattr__` already.
+
 ## [0.1.4] - 2024-07-25
 ### Added
 - Initial draft of the changelog file.

@@ -99,10 +99,7 @@ class dynamic:
         name = re.sub(r'\W+', '_', name)
         if name == '_dict':
             if isinstance(value, dict):
-                rekeyed_value = {}
-                for k, v in value.items():
-                    rekeyed_value[re.sub(r'\W+', '_', k)] = v
-                super().__setattr__(name, rekeyed_value)
+                super().__setattr__(name, value)
                 return
             raise TypeError("'dynamic' _dict attribute must be a dict")
         if name == '_strict_subtraction':
