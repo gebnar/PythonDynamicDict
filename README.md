@@ -1,10 +1,13 @@
 A dictionary wrapper that allows attribute access and mutation using both dot notation and dictionary-style indexing.
 
 ## Installation
-...TODO...
+
+`pip install DynamicDict`
 
 ## Simple Usage
+
 ```python
+from DynamicDict import dynamic
 dyn = dynamic()
 dyn.key = "Value"
 print(dyn.key) # Output: Value
@@ -38,6 +41,7 @@ Note: These are also 'reserved' keys on the instance. They can be directly set a
 - No Dependencies -- Only uses features available in the Python Standard Library!
 
 ## More Examples
+
 ```python
 data = {
     "name": "John",
@@ -78,3 +82,6 @@ def f():
     print("Hello World")
 dyn.f = f
 dyn.f() # Output Hello World
+```
+
+Check out the unit tests for even more thorough usage examples.
