@@ -11,6 +11,9 @@ from DynamicDict import dynamic
 dyn = dynamic()
 dyn.key = "Value"
 print(dyn.key) # Output: Value
+
+dyn2 = dynamic({'key':'value'},False) # Initialize with lax subtraction
+dyn._strict_subtraction = False # Set lax subtraction
 ```
 
 ## Parameters
@@ -27,6 +30,7 @@ Note: These are also 'reserved' keys on the instance. They can be directly set a
 
 - Dynamic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
 - Keys as Attributes -- Keys and Values can be accessed and set using dot notation or key notation.
+    - Any non-alphanumeric characters in dictionary keys will be replaced with underscores to be usable as attributes. Please note: this renaming could result in duplicate keys. Behavior of duplicate keys is undefined (the last one evaluated will be set, but ordering isn't guaranteed).
 - Direct Callables -- Keys can be assigned to functions, which allows calling them directly using dot notation.
     - Functions added to a dynamic object are not class methods, and do not have access to the `self` instance context.
 - Dictionary Compatibility -- Dynamic objects support common pythonic dictionary operations like iteration, item retrieval, and containment checks.
@@ -69,7 +73,7 @@ print(dyn.job)  # Output: Engineer
 
 s = ""
 for key, value in dyn.address:
-    s += f"{key}:{value},")
+    s += f"{key}:{value},"
 print(s) # Output: city:New York,zip:10001,
 
 dyn += {"hobby": "Photography"}

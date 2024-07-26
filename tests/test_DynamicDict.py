@@ -1,6 +1,6 @@
 import pytest
 
-from DynamicDict.DynamicDict import dynamic
+from DynamicDict import dynamic
 
 def test_init_with_dict():
     d = {'key1': 'value1', 'key2': {'subkey1': 'subvalue1'}}
@@ -194,3 +194,11 @@ def test_unsafe_delete():
     dd = dynamic()
     with pytest.raises(AttributeError):
         del dd._dict
+
+def test_key_renaming():
+    dd = dynamic({'key 1':'value 1'})
+    assert dd.key_1 == 'value 1'
+
+def test_key_renaming_duplicates():
+    dd = dynamic({'key 1':'value 1','key%1':'value 2'})
+    assert len(dd) == 1

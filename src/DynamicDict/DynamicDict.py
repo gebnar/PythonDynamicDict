@@ -1,10 +1,11 @@
 from typing import Dict, Any, Iterator, Union
+import re
 
 class dynamic:
     """A dictionary wrapper that allows attribute access and mutation using both dot notation and dictionary-style indexing.
 
     ## Simple Usage
-    
+
     ```python
     dyn = dynamic()
     dyn.key = "Value"
@@ -25,6 +26,7 @@ class dynamic:
 
     - Dynamic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
     - Keys as Attributes -- Keys and Values can be accessed and set using dot notation or key notation.
+        - Any non-alphanumeric characters in dictionary keys will be replaced with underscores to be usable as attributes. Please note: this renaming could result in duplicate keys. Behavior of duplicate keys is undefined (the last one evaluated will be set, but ordering isn't guaranteed).
     - Direct Callables -- Keys can be assigned to functions, which allows calling them directly using dot notation.
         - Functions added to a dynamic object are not class methods, and do not have access to the `self` instance context.
     - Dictionary Compatibility -- Dynamic objects support common pythonic dictionary operations like iteration, item retrieval, and containment checks.
@@ -67,7 +69,7 @@ class dynamic:
 
     s = ""
     for key, value in dyn.address:
-        s += f"{key}:{value},")
+        s += f"{key}:{value},"
     print(s) # Output: city:New York,zip:10001,
 
     dyn += {"hobby": "Photography"}
@@ -94,9 +96,13 @@ class dynamic:
         self += _dict or {}
 
     def __setattr__(self, name: str, value: Any) -> None:
+        name = re.sub(r'\W+', '_', name)
         if name == '_dict':
             if isinstance(value, dict):
-                super().__setattr__(name, value)
+                rekeyed_value = {}
+                for k, v in value.items():
+                    rekeyed_value[re.sub(r'\W+', '_', k)] = v
+                super().__setattr__(name, rekeyed_value)
                 return
             raise TypeError("'dynamic' _dict attribute must be a dict")
         if name == '_strict_subtraction':
