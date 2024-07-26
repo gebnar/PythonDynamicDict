@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - Add divide dunders as symmetric difference operation.
 
 ## [Unreleased] - 2024-07-25
+### Added
+- Added some missing copyright notices.
+
 ### Changed
 - Improve clarity of 'reserved' keys line in docstring/readme.
 - Add missing simple usage examples to docstring.

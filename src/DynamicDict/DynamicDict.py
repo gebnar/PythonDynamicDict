@@ -1,3 +1,8 @@
+# Copyright (c) 2024 Shane Plesner
+#
+# This software is released under the MIT License
+# https://opensource.org/licenses/MIT
+
 from typing import Dict, Any, Iterator, Union
 import re
 
