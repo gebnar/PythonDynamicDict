@@ -7,14 +7,18 @@ class dynamic:
     ## Simple Usage
 
     ```python
+    from DynamicDict import dynamic
     dyn = dynamic()
     dyn.key = "Value"
     print(dyn.key) # Output: Value
+
+    dyn2 = dynamic({'key':'value'},False) # Initialize with lax subtraction
+    dyn._strict_subtraction = False # Set lax subtraction
     ```
 
     ## Parameters
 
-    Note: These are also 'reserved' keys on the instance. They can be directly set and referenced.
+    Note: Parameters are also 'reserved' keys on the instance. They can be directly set and referenced.
 
     - `_dict: Optional[Dict[str, Any]]` -- Stores all of the instance data.
         - `{}` (default): `None` will be initialized to an empty dictionary.

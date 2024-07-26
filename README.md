@@ -18,7 +18,7 @@ dyn._strict_subtraction = False # Set lax subtraction
 
 ## Parameters
 
-Note: These are also 'reserved' keys on the instance. They can be directly set and referenced.
+Note: Parameters are also 'reserved' keys on the instance. They can be directly set and referenced.
 
 - `_dict: Optional[Dict[str, Any]]` -- Stores all of the instance data.
     - `{}` (default): `None` will be initialized to an empty dictionary.

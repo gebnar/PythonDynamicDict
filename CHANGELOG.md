@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Changed
+- Improve clarity of 'reserved' keys line in docstring/readme.
+- Add missing simple usage examples to docstring.
+
 ## [0.1.5] - 2024-07-25
 ### Removed
 - Removed extra/unnecessary key renaming logic when setting `_dict` directly. It is covered by `__setattr__` already.
