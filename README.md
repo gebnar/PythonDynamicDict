@@ -6,13 +6,13 @@ A dictionary wrapper that allows attribute access and mutation using both dot no
 
 ## Simple Usage
 
-```python
-from DynamicDict import dynamic
-dyn = dynamic()
+```py
+from dynamic_dict import Dynamic
+dyn = Dynamic()
 dyn.key = "Value"
 print(dyn.key) # Output: Value
 
-dyn2 = dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
+dyn2 = Dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
 dyn._strict_subtraction = False # Set optional setting
 ```
 
@@ -50,7 +50,7 @@ Note: Parameters are also 'reserved' keys on the instance. They can be directly 
 
 ## More Examples
 
-```python
+```py
 data = {
     "name": "John",
     "age": 30,
@@ -60,9 +60,9 @@ data = {
     }
 }
 
-dyn = dynamic(data)
+dyn = Dynamic(data)
 # or
-dyn2 = dynamic()
+dyn2 = Dynamic()
 dyn2 += data
 
 assert dyn == dyn2 # True

@@ -3,14 +3,23 @@
 All notable changes to this project will be documented in this file.
 
 ## [Roadmap]
+- Consider renaming it entirely...
+- Confirm options transferral during arithmetic operations.
 - Add some(??) interoperability with TypedDict.
 - Add multiply dunders as intersection operation.
 - Add divide dunders as symmetric difference operation.
 
-## [0.1.7]
+## [Unreleased]  - 2024-07-27
+### Changed
+- Change snake/camel case usage to match conventions. (library is now `dynamic_dict`, class is `Dynamic`)
+
+### Fixed
+- Strict Typing doesn't break in various ways when interacting with `None`. (re-implemented using a separate dictionary of types)
+
+## [0.1.7] - 2024-07-26
 - Add optional _strict_typing parameter that enforces type matching for attributes.
 
-## [0.1.6] - 2024-07-25
+## [0.1.6] - 2024-07-26
 ### Added
 - Added some missing copyright notices.
 
@@ -18,11 +27,11 @@ All notable changes to this project will be documented in this file.
 - Improve clarity of 'reserved' keys line in docstring/readme.
 - Add missing simple usage examples to docstring.
 
-## [0.1.5] - 2024-07-25
+## [0.1.5] - 2024-07-26
 ### Removed
 - Removed extra/unnecessary key renaming logic when setting `_dict` directly. It is covered by `__setattr__` already.
 
-## [0.1.4] - 2024-07-25
+## [0.1.4] - 2024-07-26
 ### Added
 - Initial draft of the changelog file.
 - Library imports dynamic for easier importing.

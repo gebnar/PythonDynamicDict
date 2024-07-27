@@ -6,7 +6,7 @@
 from typing import Dict, Any, Iterator, Union
 import re
 
-class dynamic:
+class Dynamic:
     """A dictionary wrapper that allows attribute access and mutation using both dot notation and dictionary-style indexing.
 
     ## Simple Usage
@@ -23,9 +23,9 @@ class dynamic:
 
     ## Parameters
 
-    Note: Parameters are also 'reserved' keys on the instance. They can be directly set and referenced.
+    These are safe to set after instantiation using normal dot notation (e.g. `dyn._dict = some_dict`).
 
-    - `_dict: Optional[Dict[str, Any]]` -- Stores all of the instance data.
+    - `_dict: Optional[Dict[str, Any]]` -- Stores the attribute data.
         - `{}` (default): `None` will be initialized to an empty dictionary.
     - `_strict_typing: Optional[bool]` -- Specifies whether attributes should have strict or dynamic typing.
         - `False` (default): Attributes can be reassigned to anything, like any other python variable.
@@ -33,6 +33,15 @@ class dynamic:
     - `_strict_subtraction: Optional[bool]` -- Specifies how subtraction operations will behave.
         - `True` (default): Subtraction operations will only remove matching keys if the corresponding values also match.
         - `False`: Subtraction operations will remove any matching keys found, regardless of value.
+
+    ## Namespace Pollution
+
+    Care has been taken to avoid polluting the attribute namespace more than necessary. Here is the complete list of internal parameters used by the class:
+
+        - `_dict`
+        - `_dict_types`
+        - `_strict_subtraction`
+        - `_strict_typing`
 
     ## Features
 
@@ -100,11 +109,11 @@ class dynamic:
     Check out the unit tests for even more thorough usage examples.
     """
     def __init__(self,
-                _dict: Union[Dict[str, Any],'dynamic',None] = None,
+                _dict: Union[Dict[str, Any],'Dynamic',None] = None,
                 _strict_subtraction: bool = True,
                 _strict_typing: bool = False
             ) -> None:
-        if _dict is not None and not isinstance(_dict, (dict,dynamic)):
+        if _dict is not None and not isinstance(_dict, (dict,Dynamic)):
             raise TypeError("'dynamic' _dict argument must be a dict or dynamic")
         if _strict_subtraction is not None and not isinstance(_strict_subtraction, bool):
             raise TypeError("'dynamic' _strict_subtraction argument must be a bool")
@@ -113,11 +122,12 @@ class dynamic:
         self._strict_subtraction = _strict_subtraction
         self._strict_typing = _strict_typing
         self._dict = {}
+        self._dict_types = {}
         self += _dict or {}
 
     def __setattr__(self, name: str, value: Any) -> None:
         name = re.sub(r'\W+', '_', name)
-        if name == '_dict':
+        if name in ('_dict','_dict_types'):
             if isinstance(value, dict):
                 super().__setattr__(name, value)
                 return
@@ -127,27 +137,29 @@ class dynamic:
                 super().__setattr__(name, value)
                 return
             raise TypeError(f"'dynamic' {name} attribute must be a bool")
-        if self._strict_typing and name in self:
-            target_type = dynamic if isinstance(value, (dict,dynamic)) else type(value)
-            if target_type != type(self._dict[name]):
-                raise TypeError(f"'dynamic' with '_strict_typing' enabled prohibits setting {name}:{type(self._dict[name])} to type {target_type}. ")
-        self._dict[name] = dynamic(value) if isinstance(value, dict) else value
+        if self._strict_typing and value is not None and name in self:
+            target_type = Dynamic if isinstance(value, (dict,Dynamic)) else type(value)
+            if target_type != self._dict_types[name]:
+                raise TypeError(f"'dynamic' with '_strict_typing' enabled prohibits setting {name}:{self._dict_types[name]} to type {target_type}. ")
+        self._dict[name] = Dynamic(value) if isinstance(value, dict) else value
+        if value != None:
+            self._dict_types[name] = Dynamic if isinstance(value, dict) else type(value)
 
-    def __iadd__(self, other: Any) -> 'dynamic':
-        if isinstance(other, (dynamic, dict)):
+    def __iadd__(self, other: Any) -> 'Dynamic':
+        if isinstance(other, (Dynamic, dict)):
             for key, value in other.items() if isinstance(other, dict) else other._dict.items():
                 self.__setattr__(key, value)
             return self
         raise TypeError(f"Unsupported operand type(s) for +, +=: 'dynamic' and '{type(other).__name__}'. ")
 
-    def __add__(self, other: Any) -> 'dynamic':
-        new = dynamic()
+    def __add__(self, other: Any) -> 'Dynamic':
+        new = Dynamic()
         new += self
         new += other
         return new
 
-    def __isub__(self, other: Any) -> 'dynamic':
-        if isinstance(other, (dynamic, dict)):
+    def __isub__(self, other: Any) -> 'Dynamic':
+        if isinstance(other, (Dynamic, dict)):
             if self._strict_subtraction:
                 for key, value in other.items() if isinstance(other, dict) else other._dict.items():
                     if (self._dict.get(key) == value):
@@ -161,8 +173,8 @@ class dynamic:
             return self
         raise TypeError(f"Unsupported operand type(s) for -, -=: 'dynamic' and '{type(other).__name__}'. ")
 
-    def __sub__(self, other: Any) -> 'dynamic':
-        new = dynamic()
+    def __sub__(self, other: Any) -> 'Dynamic':
+        new = Dynamic()
         new += self
         new -= other
         return new
@@ -195,7 +207,7 @@ class dynamic:
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, dict):
             return self._dict == other
-        if isinstance(other, dynamic):
+        if isinstance(other, Dynamic):
             return self._dict == other._dict
         return False
 
