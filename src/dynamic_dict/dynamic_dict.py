@@ -12,12 +12,12 @@ class Dynamic:
     ## Simple Usage
 
     ```python
-    from DynamicDict import dynamic
-    dyn = dynamic()
+    from dynamic_dict import Dynamic
+    dyn = Dynamic()
     dyn.key = "Value"
     print(dyn.key) # Output: Value
 
-    dyn2 = dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
+    dyn2 = Dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
     dyn._strict_subtraction = False # Set optional setting
     ```
 
@@ -74,9 +74,9 @@ class Dynamic:
         }
     }
 
-    dyn = dynamic(data)
+    dyn = Dynamic(data)
     # or
-    dyn2 = dynamic()
+    dyn2 = Dynamic()
     dyn2 += data
 
     assert dyn == dyn2 # True
