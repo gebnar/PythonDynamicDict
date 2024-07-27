@@ -12,8 +12,8 @@ dyn = dynamic()
 dyn.key = "Value"
 print(dyn.key) # Output: Value
 
-dyn2 = dynamic({'key':'value'},False) # Initialize with lax subtraction
-dyn._strict_subtraction = False # Set lax subtraction
+dyn2 = dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
+dyn._strict_subtraction = False # Set optional setting
 ```
 
 ## Parameters
@@ -22,13 +22,17 @@ Note: Parameters are also 'reserved' keys on the instance. They can be directly 
 
 - `_dict: Optional[Dict[str, Any]]` -- Stores all of the instance data.
     - `{}` (default): `None` will be initialized to an empty dictionary.
+- `_strict_typing: Optional[bool]` -- Specifies whether attributes should have strict or dynamic typing.
+    - `False` (default): Attributes can be reassigned to anything, like any other python variable.
+    - `True`: A TypeError will be thrown when updating an attribute value to something that doesn't match the current value's type.
 - `_strict_subtraction: Optional[bool]` -- Specifies how subtraction operations will behave.
     - `True` (default): Subtraction operations will only remove matching keys if the corresponding values also match.
     - `False`: Subtraction operations will remove any matching keys found, regardless of value.
 
 ## Features
 
-- Dynamic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
+- Automatic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
+- Strict Typing -- By enabling the optional `_strict_typing` parameter, you can force type matching during attribute reassignment.
 - Keys as Attributes -- Keys and Values can be accessed and set using dot notation or key notation.
     - Any non-alphanumeric characters in dictionary keys will be replaced with underscores to be usable as attributes. Please note: this renaming could result in duplicate keys. Behavior of duplicate keys is undefined (the last one evaluated will be set, but ordering isn't guaranteed).
 - Direct Callables -- Keys can be assigned to functions, which allows calling them directly using dot notation.

@@ -3,10 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Roadmap]
+- Add some(??) interoperability with TypedDict.
 - Add multiply dunders as intersection operation.
 - Add divide dunders as symmetric difference operation.
 
-## [Unreleased] - 2024-07-25
+## [0.1.7]
+- Add optional _strict_typing parameter that enforces type matching for attributes.
+
+## [0.1.6] - 2024-07-25
 ### Added
 - Added some missing copyright notices.
 

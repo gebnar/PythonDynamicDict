@@ -17,8 +17,8 @@ class dynamic:
     dyn.key = "Value"
     print(dyn.key) # Output: Value
 
-    dyn2 = dynamic({'key':'value'},False) # Initialize with lax subtraction
-    dyn._strict_subtraction = False # Set lax subtraction
+    dyn2 = dynamic({'key':'value'},_strict_typing = True) # Initialize with optional setting
+    dyn._strict_subtraction = False # Set optional setting
     ```
 
     ## Parameters
@@ -27,13 +27,17 @@ class dynamic:
 
     - `_dict: Optional[Dict[str, Any]]` -- Stores all of the instance data.
         - `{}` (default): `None` will be initialized to an empty dictionary.
+    - `_strict_typing: Optional[bool]` -- Specifies whether attributes should have strict or dynamic typing.
+        - `False` (default): Attributes can be reassigned to anything, like any other python variable.
+        - `True`: A TypeError will be thrown when updating an attribute value to something that doesn't match the current value's type.
     - `_strict_subtraction: Optional[bool]` -- Specifies how subtraction operations will behave.
         - `True` (default): Subtraction operations will only remove matching keys if the corresponding values also match.
         - `False`: Subtraction operations will remove any matching keys found, regardless of value.
 
     ## Features
 
-    - Dynamic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
+    - Automatic Nesting -- Any dictionary added to a dynamic is automatically converted to a dynamic, allowing seamless nesting of dynamic objects.
+    - Strict Typing -- By enabling the optional `_strict_typing` parameter, you can force type matching during attribute reassignment.
     - Keys as Attributes -- Keys and Values can be accessed and set using dot notation or key notation.
         - Any non-alphanumeric characters in dictionary keys will be replaced with underscores to be usable as attributes. Please note: this renaming could result in duplicate keys. Behavior of duplicate keys is undefined (the last one evaluated will be set, but ordering isn't guaranteed).
     - Direct Callables -- Keys can be assigned to functions, which allows calling them directly using dot notation.
@@ -95,12 +99,19 @@ class dynamic:
 
     Check out the unit tests for even more thorough usage examples.
     """
-    def __init__(self, _dict: Union[Dict[str, Any],'dynamic',None] = None, _strict_subtraction: bool = True) -> None:
+    def __init__(self,
+                _dict: Union[Dict[str, Any],'dynamic',None] = None,
+                _strict_subtraction: bool = True,
+                _strict_typing: bool = False
+            ) -> None:
         if _dict is not None and not isinstance(_dict, (dict,dynamic)):
             raise TypeError("'dynamic' _dict argument must be a dict or dynamic")
         if _strict_subtraction is not None and not isinstance(_strict_subtraction, bool):
             raise TypeError("'dynamic' _strict_subtraction argument must be a bool")
+        if _strict_typing is not None and not isinstance(_strict_typing, bool):
+            raise TypeError("'dynamic' _strict_subtraction argument must be a bool")
         self._strict_subtraction = _strict_subtraction
+        self._strict_typing = _strict_typing
         self._dict = {}
         self += _dict or {}
 
@@ -111,11 +122,15 @@ class dynamic:
                 super().__setattr__(name, value)
                 return
             raise TypeError("'dynamic' _dict attribute must be a dict")
-        if name == '_strict_subtraction':
+        if name in ('_strict_subtraction','_strict_typing'):
             if isinstance(value, bool):
                 super().__setattr__(name, value)
                 return
-            raise TypeError("'dynamic' _strict_subtraction attribute must be a bool")
+            raise TypeError(f"'dynamic' {name} attribute must be a bool")
+        if self._strict_typing and name in self:
+            target_type = dynamic if isinstance(value, (dict,dynamic)) else type(value)
+            if target_type != type(self._dict[name]):
+                raise TypeError(f"'dynamic' with '_strict_typing' enabled prohibits setting {name}:{type(self._dict[name])} to type {target_type}. ")
         self._dict[name] = dynamic(value) if isinstance(value, dict) else value
 
     def __iadd__(self, other: Any) -> 'dynamic':

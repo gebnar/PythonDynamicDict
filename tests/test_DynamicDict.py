@@ -207,3 +207,27 @@ def test_key_renaming():
 def test_key_renaming_duplicates():
     dd = dynamic({'key 1':'value 1','key%1':'value 2'})
     assert len(dd) == 1
+
+def test_strict_typing():
+    dd = dynamic({
+        'number_key': 123,
+        'string_key': 'my string',
+        'dict_key': {'subkey':'subvalue'},
+        'exception_key': TypeError,
+    },_strict_typing = True)
+    with pytest.raises(TypeError):
+        dd.number_key = 'not a number'
+    dd.number_key = 321
+    assert dd.number_key == 321
+    with pytest.raises(TypeError):
+        dd.string_key = 123
+    dd.string_key = 'another string'
+    assert dd.string_key == 'another string'
+    with pytest.raises(TypeError):
+        dd.dict_key = 'not a dict'
+    dd.dict_key = {'a':'new dict'}
+    assert dd.dict_key.a == 'new dict'
+    with pytest.raises(TypeError):
+        dd.exception_key = 'not an error'
+    dd.exception_key = AttributeError
+    assert dd.exception_key == AttributeError
