@@ -235,3 +235,18 @@ def test_strict_typing():
     assert dd.exception_key == None
     dd.exception_key = AssertionError
     assert dd.exception_key == AssertionError
+
+def test_add_parameter_preservation():
+    dd = Dynamic({'number_key':123},_strict_typing = True)
+    dd2 = dd + {'string_key':'some string'}
+    assert dd2._strict_typing == True
+    dd3 = Dynamic({'string_key':'some string'}) + dd
+    assert dd3._strict_typing == False
+
+def test_sub_parameter_preservation():
+    d = {'number_key':123}
+    dd = Dynamic(d,_strict_typing = True)
+    dd2 = dd - d
+    assert dd2._strict_typing == True
+    dd3 = Dynamic(d) - dd
+    assert dd3._strict_typing == False

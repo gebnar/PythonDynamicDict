@@ -153,8 +153,7 @@ class Dynamic:
         raise TypeError(f"Unsupported operand type(s) for +, +=: 'dynamic' and '{type(other).__name__}'. ")
 
     def __add__(self, other: Any) -> 'Dynamic':
-        new = Dynamic()
-        new += self
+        new = Dynamic(self, self._strict_subtraction, self._strict_typing)
         new += other
         return new
 
@@ -174,8 +173,7 @@ class Dynamic:
         raise TypeError(f"Unsupported operand type(s) for -, -=: 'dynamic' and '{type(other).__name__}'. ")
 
     def __sub__(self, other: Any) -> 'Dynamic':
-        new = Dynamic()
-        new += self
+        new = Dynamic(self, self._strict_subtraction, self._strict_typing)
         new -= other
         return new
 
