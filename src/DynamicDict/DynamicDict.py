@@ -4,7 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 from typing import Dict, Any, Iterator, Union
-import re
+import re, inspect
 
 class Dynamic:
     """A dictionary wrapper that allows attribute access and mutation using both dot notation and dictionary-style indexing.
@@ -34,14 +34,17 @@ class Dynamic:
         - `True` (default): Subtraction operations will only remove matching keys if the corresponding values also match.
         - `False`: Subtraction operations will remove any matching keys found, regardless of value.
 
-    ## Namespace Pollution
+    ## Namespace Usage
 
-    Care has been taken to avoid polluting the attribute namespace more than necessary. Here is the complete list of internal parameters used by the class:
+    Care has been taken to avoid polluting the attribute namespace more than necessary. Here is the complete list of internal parameters used by the class.
 
+    - These attributes are "safe" / intended to be modified directly
         - `_dict`
-        - `_dict_types`
         - `_strict_subtraction`
         - `_strict_typing`
+    - These attributes should not be modified.
+        - `_dict_types`
+        - `_bind_self`
 
     ## Features
 
@@ -49,8 +52,8 @@ class Dynamic:
     - Strict Typing -- By enabling the optional `_strict_typing` parameter, you can force type matching during attribute reassignment.
     - Keys as Attributes -- Keys and Values can be accessed and set using dot notation or key notation.
         - Any non-alphanumeric characters in dictionary keys will be replaced with underscores to be usable as attributes. Please note: this renaming could result in duplicate keys. Behavior of duplicate keys is undefined (the last one evaluated will be set, but ordering isn't guaranteed).
-    - Direct Callables -- Keys can be assigned to functions, which allows calling them directly using dot notation.
-        - Functions added to a dynamic object are not class methods, and do not have access to the `self` instance context.
+    - Callable Integration -- Keys can be assigned to anything, including functions, which allows calling them directly using dot notation.
+        - Functions called from a dynamic object context are wrapped to give optional access to `self`. If the first parameter of a function is `self` then the parent dynamic instance is prepended to the arguments when the function is called.
     - Dictionary Compatibility -- Dynamic objects support common pythonic dictionary operations like iteration, item retrieval, and containment checks.
         - To preserve namespace availability, dictionary methods like `get`/`add`/`keys`/`pop`/`clear`/etc. are not implemented directly. You can use the `_dict` element to access them directly on the underlying dictionary `dyn._dict.get('key1')`.
         - Iteration uses the dictionary tuple `.items()` iterator. E.g. `for key, val in some_dynamic...`.
@@ -104,6 +107,12 @@ class Dynamic:
         print("Hello World")
     dyn.f = f
     dyn.f() # Output Hello World
+
+    def get_name(self):
+        return self.name
+    dd = Dynamic({'name':'John'})
+    dd.get_name = get_name
+    assert dd.get_name() == 'John'
     ```
 
     Check out the unit tests for even more thorough usage examples.
@@ -118,7 +127,7 @@ class Dynamic:
         if _strict_subtraction is not None and not isinstance(_strict_subtraction, bool):
             raise TypeError("'dynamic' _strict_subtraction argument must be a bool")
         if _strict_typing is not None and not isinstance(_strict_typing, bool):
-            raise TypeError("'dynamic' _strict_subtraction argument must be a bool")
+            raise TypeError("'dynamic' _strict_typing argument must be a bool")
         self._strict_subtraction = _strict_subtraction
         self._strict_typing = _strict_typing
         self._dict = {}
@@ -127,12 +136,14 @@ class Dynamic:
 
     def __setattr__(self, name: str, value: Any) -> None:
         name = re.sub(r'\W+', '_', name)
-        if name in ('_dict','_dict_types'):
+        if name in ('_bind_self',):
+            raise ValueError(f"'dynamic' {name} attribute should not be modified!")
+        elif name in ('_dict','_dict_types'):
             if isinstance(value, dict):
                 super().__setattr__(name, value)
                 return
             raise TypeError("'dynamic' _dict attribute must be a dict")
-        if name in ('_strict_subtraction','_strict_typing'):
+        elif name in ('_strict_subtraction','_strict_typing'):
             if isinstance(value, bool):
                 super().__setattr__(name, value)
                 return
@@ -177,10 +188,31 @@ class Dynamic:
         new -= other
         return new
 
+    def _bind_self(self, func):
+        def wrapper(*args, **kwargs):
+            try:
+                sig = inspect.signature(func)
+                first_param = next(iter(sig.parameters.keys()))
+                if first_param == 'self':
+                    return func(self, *args, **kwargs)
+            except StopIteration:
+                pass
+            return func(*args, **kwargs)
+        return wrapper
+
     def __getattr__(self, name: str) -> Any:
         if name in self._dict:
-            return self._dict[name]
+            attr = self._dict[name]
+            if inspect.isfunction(attr):
+                attr = self._bind_self(attr)
+            return attr
         raise AttributeError(f"'dynamic' object has no attribute '{name}'")
+
+    def __getitem__(self, key: str) -> Any:
+        try:
+            return self.__getattr__(key)
+        except AttributeError:
+            raise KeyError(key)
 
     def __delattr__(self, name: str) -> None:
         if name in self._dict:
@@ -193,11 +225,6 @@ class Dynamic:
 
     def __repr__(self) -> str:
         return repr(self._dict)
-
-    def __getitem__(self, key: str) -> Any:
-        if key in self._dict:
-            return self._dict[key]
-        raise KeyError(key)
 
     def __contains__(self, key: str) -> bool:
         return key in self._dict

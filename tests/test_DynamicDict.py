@@ -250,3 +250,42 @@ def test_sub_parameter_preservation():
     assert dd2._strict_typing == True
     dd3 = Dynamic(d) - dd
     assert dd3._strict_typing == False
+
+def test_callable_with_bound_self():
+    def get_name(self):
+        return self.name
+    dd = Dynamic({'name':'John'})
+    dd.get_name = get_name
+    assert dd.get_name() == 'John'
+    assert dd['get_name']() == 'John'
+
+def test_callable_without_bound_self():
+    def f(var):
+        return f'{var}'
+    dd = Dynamic()
+    dd.f = f
+    assert dd.f('some var') == 'some var'
+
+def test_nested_callable_with_bound_self():
+    def f(self):
+        return f'{self.subkey}'
+    dd = Dynamic({'key':Dynamic({'subkey':'subvalue'})})
+    dd.key.f = f
+    assert dd.key.f() == f'{dd.key.subkey}'
+
+def test_protected_attribute_reassignment():
+    dd = Dynamic()
+    with pytest.raises(ValueError):
+        dd._bind_self = 'Hello World'
+
+def test_callable_with_non_bound_self():
+    dd = Dynamic()
+    def f(var, self):
+        return f'{var} {self}'
+    dd.f = f
+    assert dd.f('Hello','World') == 'Hello World'
+
+def test_lambda_with_self():
+    dd = Dynamic()
+    dd.f = lambda self, other: f'{type(self)},{other}'
+    assert dd.f('some string') == f'{type(dd)},some string'
