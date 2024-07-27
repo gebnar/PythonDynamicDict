@@ -7,7 +7,7 @@ A dictionary wrapper that allows attribute access and mutation using both dot no
     ## Simple Usage
 
     ```python
-    from dynamic_dict import Dynamic
+    from DynamicDict import Dynamic
     dyn = Dynamic()
     dyn.key = "Value"
     print(dyn.key) # Output: Value

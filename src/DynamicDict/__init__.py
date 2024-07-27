@@ -3,4 +3,4 @@
 __version__ = "0.2.0"
 
 # For easy import...
-from .dynamic_dict import Dynamic
+from .DynamicDict import Dynamic

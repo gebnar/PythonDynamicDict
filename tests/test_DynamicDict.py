@@ -5,7 +5,7 @@
 
 import pytest
 
-from dynamic_dict import Dynamic
+from DynamicDict import Dynamic
 
 def test_init_with_dict():
     d = {'key1': 'value1', 'key2': {'subkey1': 'subvalue1'}}

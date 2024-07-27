@@ -12,7 +12,7 @@ class Dynamic:
     ## Simple Usage
 
     ```python
-    from dynamic_dict import Dynamic
+    from DynamicDict import Dynamic
     dyn = Dynamic()
     dyn.key = "Value"
     print(dyn.key) # Output: Value

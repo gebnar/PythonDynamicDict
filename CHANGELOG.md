@@ -3,14 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Roadmap]
-- Consider renaming it entirely...
+- Consider renaming the project...
 - Add some(??) interoperability with TypedDict.
 - Add multiply dunders as intersection operation.
 - Add divide dunders as symmetric difference operation.
 
 ## [0.2.0]  - 2024-07-27
 ### Changed
-- Change snake/camel case usage to match conventions. (library is now `dynamic_dict`, class is `Dynamic`)
+- Change class name to `Dynamic` to better match conventions.
 
 ### Fixed
 - Strict Typing doesn't break in various ways when interacting with `None`. (re-implemented using a separate dictionary of types)
